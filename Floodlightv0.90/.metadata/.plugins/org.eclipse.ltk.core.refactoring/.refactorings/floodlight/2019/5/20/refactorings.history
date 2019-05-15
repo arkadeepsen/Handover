@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;OFNATAdd.java&apos; to &apos;floodlight/src/main/java/net.floodlightcontroller.ofSwitchAP&apos;&#x0A;- Original project: &apos;floodlight&apos;&#x0A;- Destination element: &apos;floodlight/src/main/java/net.floodlightcontroller.ofSwitchAP&apos;&#x0A;- Original element: &apos;net.floodlightcontroller.ofSwitchAP.OFNATAdd.java&apos;" description="Copy compilation unit" destination="/src\/main\/java&lt;net.floodlightcontroller.ofSwitchAP" element1="/src\/main\/java&lt;net.floodlightcontroller.ofSwitchAP{OFNATAdd.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1557832052828" units="1" version="1.0"/>
+</session>

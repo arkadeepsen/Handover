@@ -1,0 +1,17 @@
+1447171047150	Delete elements
+1447172778731	Delete element
+1447175659843	Rename type 'OFWlanHeaderVendorData'
+1447175681783	Rename type 'OFWlanVendorData'
+1447226810174	Rename local variable 'niciraVendorData'
+1447226846838	Rename local variable 'dataType'
+1447228033309	Rename type 'OFWlanDeaut'
+1447228063402	Rename type 'OFWlanDeauth'
+1447228405714	Rename field 'WLAN_DISASSOC_REQ'
+1447259900287	Encapsulate field 'staMACAddress'
+1447264051316	Rename local variable 'staInfo'
+1447273900383	Rename field 'WLAN_ASSOC_REQ'
+1447274661695	Rename local variable 'removeSTA'
+1447275773817	Rename local variable 'removeSTAData'
+1447275817980	Rename local variable 'removeSTA'
+1447290512398	Rename field 'WLAN_PROBE'
+1447396666672	Rename field 'staMACAddress'

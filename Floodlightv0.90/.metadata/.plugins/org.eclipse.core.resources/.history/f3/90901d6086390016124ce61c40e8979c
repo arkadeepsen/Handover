@@ -1,0 +1,17 @@
+package net.floodlightcontroller.ofSwitchAP;
+
+import org.openflow.protocol.action.OFActionVendor;
+
+public class OFPushIPH extends OFActionVendor 
+{
+	
+	int tunnelEntry;
+	int tunnelExit;
+	
+	public OFPushIPH() 
+	{
+		super();
+	}
+	
+	
+}

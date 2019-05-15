@@ -1,0 +1,335 @@
+package net.floodlightcontroller.ofSwitchAP;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFPacketOut;
+import org.openflow.protocol.OFType;
+import org.openflow.protocol.OFVendor;
+import org.openflow.util.HexString;
+import org.openflow.vendor.nicira.OFNiciraVendorData;
+import org.openflow.vendor.nicira.OFRoleRequestVendorData;
+
+import net.floodlightcontroller.core.FloodlightContext;
+import net.floodlightcontroller.core.IFloodlightProviderService;
+import net.floodlightcontroller.core.IOFMessageListener;
+import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.core.IOFSwitchListener;
+import net.floodlightcontroller.core.module.FloodlightModuleContext;
+import net.floodlightcontroller.core.module.FloodlightModuleException;
+import net.floodlightcontroller.core.module.IFloodlightModule;
+import net.floodlightcontroller.core.module.IFloodlightService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class OFSwitchAP implements IOFMessageListener, IOFSwitchListener,
+		IFloodlightModule {
+	
+	protected IFloodlightProviderService floodlightProvider;
+	protected static Logger logger;
+	
+	protected HashMap<STAAPPair, OFSwitchAP.STAAPInfo> STAAPList;
+	protected HashMap<String, IOFSwitch> apSwitchMap;
+
+	@Override
+	public String getName() {
+		return OFSwitchAP.class.getSimpleName();
+	}
+
+	@Override
+	public boolean isCallbackOrderingPrereq(OFType type, String name) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCallbackOrderingPostreq(OFType type, String name) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Class<? extends IFloodlightService>, IFloodlightService> getServiceImpls() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Class<? extends IFloodlightService>> getModuleDependencies() {
+		Collection<Class<? extends IFloodlightService>> l =
+				new ArrayList<Class<? extends IFloodlightService>>();
+		l.add(IFloodlightProviderService.class);
+		return l;
+	}
+
+	@Override
+	public void init(FloodlightModuleContext context)
+			throws FloodlightModuleException {
+		floodlightProvider = context.getServiceImpl(IFloodlightProviderService.class);
+		logger = LoggerFactory.getLogger(OFSwitchAP.class);
+		STAAPList = new HashMap<OFSwitchAP.STAAPPair, OFSwitchAP.STAAPInfo>();
+		apSwitchMap = new HashMap<String, IOFSwitch>();
+	}
+
+	@Override
+	public void startUp(FloodlightModuleContext context) {
+		floodlightProvider.addOFMessageListener(OFType.VENDOR, this);
+	}
+
+	@Override
+	public void addedSwitch(IOFSwitch sw) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removedSwitch(IOFSwitch sw) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void switchPortChanged(Long switchId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public net.floodlightcontroller.core.IListener.Command receive(
+			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
+		OFVendor vendorMsg = (OFVendor)msg;
+		if(vendorMsg.getVendor() == OFWlanHeader.AP_EXPERIMENTER_ID)
+		{
+			OFWlanHeader wlanData = (OFWlanHeader)vendorMsg.getVendorData();
+			int subType = wlanData.getSubtype();
+			switch (subType) {
+			case OFWlanProbe.WLAN_PROBE:
+				logger.info("Received Probe Request Message");
+				OFWlanProbe wlanProbe = (OFWlanProbe) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanProbe.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanProbe.apMacAddress));
+				handleProbeReq(sw, wlanProbe);
+				break;
+			case OFWlanAuthRequest.WLAN_AUTH_REQ:
+				logger.info("Received Authentication Request Message");
+				OFWlanAuthRequest wlanAuthReq = (OFWlanAuthRequest) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanAuthReq.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanAuthReq.apMacAddress));
+				handleAuthReq(sw, wlanAuthReq);
+				break;
+			case OFWlanAssociationRequest.WLAN_ASSOC_REQ:
+				logger.info("Received Association Request Message");
+				OFWlanAssociationRequest wlanAssocReq = (OFWlanAssociationRequest) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanAssocReq.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanAssocReq.apMacAddress));
+				break;
+			case OFWlanReassociationRequest.WLAN_REASSOC_REQ:
+				logger.info("Received Reassociation Request Message");
+				OFWlanReassociationRequest wlanReassocReq = 
+						(OFWlanReassociationRequest) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanReassocReq.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanReassocReq.apMacAddress));
+				break;
+			case OFWlanDisassociationRequest.WLAN_DISASSOC_REQ:
+				logger.info("Received Disassociation Request Message");
+				OFWlanDisassociationRequest wlanDisassocReq = 
+						(OFWlanDisassociationRequest) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanDisassocReq.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanDisassocReq.apMacAddress));
+				break;
+			case OFWlanDeauthRequest.WLAN_DEAUTH_REQ:
+				logger.info("Received Deauthentication Request Message");
+				OFWlanDeauthRequest wlanDeauthReq = (OFWlanDeauthRequest) wlanData;
+				logger.info("STA MAC Address: {}",
+						HexString.toHexString(wlanDeauthReq.staMacAddress));
+				logger.info("STA AP Address: {}",
+						HexString.toHexString(wlanDeauthReq.apMacAddress));
+				break;
+			case OFWlanAddSTA.WLAN_ADD_STA:
+			case OFWlanRemoveSTA.WLAN_REMOVE_STA:
+				break;
+			default:
+				logger.warn("Unhandled WLAN message; " +
+						"sub type = {}", subType);
+				break;
+			}
+			return Command.STOP;
+		}
+		return Command.CONTINUE;
+	}
+	
+	private synchronized void handleProbeReq(IOFSwitch sw, OFWlanProbe wlanProbe)
+	{
+		String staAddress = HexString.toHexString(wlanProbe.staMacAddress);
+		String apAddress = HexString.toHexString(wlanProbe.apMacAddress);
+		if(findSTAAPPair(staAddress, apAddress))
+		{
+	        logger.info("STA: {} switch: {}", HexString.toHexString(wlanProbe.staMacAddress),
+	        		sw.getId());
+	        logger.info("STA probe request already received by other AP");
+	        return;
+		}
+		
+
+	    STAAPInfo staAPOld = findSTAAPInfo(staAddress);
+	    // create STA entry if needed
+	    STAAPInfo staAP = lookupSenderSTAAP(staAddress, apAddress);
+	    if (staAP == null)
+	    {
+	    	STAAPPair apStaPair = new STAAPPair(staAddress, apAddress);
+	    	staAP = new STAAPInfo(staAddress, apAddress, null, false);
+	    	STAAPList.put(apStaPair, staAP);
+	        apSwitchMap.put(apAddress, sw);
+	    }
+	    staAP.status = STAStatus.SELECTED;
+	    staAP.isHomeAP = true;
+	    
+	    if(staAPOld != null && staAP != staAPOld)
+	    {
+	        staAPOld.isHomeAP = false;
+	        staAPOld.status = STAStatus.NOT_AUTHENTICATED;
+	        IOFSwitch oldSw = apSwitchMap.get(staAPOld.apMACAddress);
+
+	        OFWlanRemoveSTA removeSTAData =  new OFWlanRemoveSTA();
+	        removeSTAData.staMacAddress = wlanProbe.staMacAddress;
+	        OFVendor removeSTA = (OFVendor) floodlightProvider.getOFMessageFactory()
+	                .getMessage(OFType.VENDOR);
+	        removeSTA.setVendor(OFWlanHeader.AP_EXPERIMENTER_ID);
+	        removeSTA.setVendorData(removeSTAData);
+            removeSTA.setLengthU(OFVendor.MINIMUM_LENGTH + 
+            		removeSTA.getLength());
+            try {
+            	oldSw.write(removeSTA, null);
+            	logger.info("STA: {} switch: {}", 
+            			HexString.toHexString(removeSTAData.staMacAddress),
+            			oldSw.getId());
+    	        logger.info("Removing STA as it has moved towards another AP");
+            } catch (IOException e) {
+                logger.error("Failed to write {} to switch {}", 
+                		new Object[]{ removeSTA, oldSw }, e);
+            }
+	    }
+
+	    OFWlanAddSTA addSTAData =  new OFWlanAddSTA();
+        addSTAData.staMacAddress = wlanProbe.staMacAddress;
+        OFVendor addSTA = (OFVendor) floodlightProvider.getOFMessageFactory()
+                .getMessage(OFType.VENDOR);
+        addSTA.setVendor(OFWlanHeader.AP_EXPERIMENTER_ID);
+        addSTA.setVendorData(addSTAData);
+        addSTA.setLengthU(OFVendor.MINIMUM_LENGTH + 
+        		addSTA.getLength());
+        try {
+        	sw.write(addSTA, null);
+        	logger.info("STA: {} switch: {}", 
+        			HexString.toHexString(addSTAData.staMacAddress),
+        			sw.getId());
+	        logger.info("Adding STA to AP based on the probe request received");
+        } catch (IOException e) {
+            logger.error("Failed to write {} to switch {}", new Object[]{ addSTA, sw }, e);
+        }
+	}
+	
+	private synchronized void handleAuthReq(IOFSwitch sw, OFWlanAuthRequest wlanAuthReq)
+	{
+		
+	}
+	
+	private boolean findSTAAPPair(String staAddress, String apAddress)
+	{
+		for(Entry<STAAPPair, STAAPInfo> entry: STAAPList.entrySet())
+		{
+			String staAdd = entry.getKey().staMACAddress;
+	        if(staAdd.equals(staAddress))
+	        {
+	        	String apAdd = entry.getKey().apMACAddress;
+	            STAAPInfo staAp = entry.getValue();
+	            if(apAdd.equals(apAddress) && staAp.status == STAStatus.SELECTED)
+	                return true;
+	        }
+		}
+		return false;
+	}
+	
+	private STAAPInfo lookupSenderSTAAP(String staAddress, String apAddress)
+	{
+		for(Entry<STAAPPair, STAAPInfo> entry: STAAPList.entrySet())
+		{
+			String staAdd = entry.getKey().staMACAddress;
+			String apAdd = entry.getKey().apMACAddress;
+            if(apAdd.equals(apAddress) && staAdd.equals(staAddress))
+	        {
+	        	return entry.getValue();
+	        }
+		}
+	   return null;
+	}
+	
+	private STAAPInfo findSTAAPInfo(String staAddress)
+	{
+		for(Entry<STAAPPair, STAAPInfo> entry: STAAPList.entrySet())
+		{
+			String staAdd = entry.getKey().staMACAddress;
+	        if(staAdd.equals(staAddress))
+	        {
+	            STAAPInfo staAp = entry.getValue();
+	            if(staAp.status == STAStatus.ASSOCIATED)
+	                return staAp;
+	        }
+	    }
+	    return null;
+	}
+	
+	private enum STAStatus {SELECTED, NOT_AUTHENTICATED, AUTHENTICATED, ASSOCIATED};
+	
+	private class STAAPPair
+	{
+		private String staMACAddress; 
+		private String apMACAddress;
+		
+		public STAAPPair(String staMACAddress, String apMACAddress) {
+			this.staMACAddress = staMACAddress;
+			this.apMACAddress = apMACAddress;
+		}
+		
+	}
+	
+	private class STAAPInfo
+	{
+		private String staMACAddress;
+		private String apMACAddress;
+		private STAStatus status;
+		private boolean isHomeAP;
+
+		public STAAPInfo(String staMACAddress, String apMACAddress, STAStatus status,
+				boolean isHomeAP) {
+			this.staMACAddress = staMACAddress;
+			this.apMACAddress = apMACAddress;
+			this.status = status;
+			this.isHomeAP = isHomeAP;
+		}
+	}
+
+}

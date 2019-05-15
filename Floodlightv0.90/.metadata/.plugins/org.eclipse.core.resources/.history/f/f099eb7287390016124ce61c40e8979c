@@ -1,0 +1,56 @@
+package net.floodlightcontroller.ofSwitchAP;
+
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.protocol.action.OFActionVendor;
+
+public class OFActionPushIPH extends OFActionVendor 
+{
+	int tunnelEntry;
+	int tunnelExit;
+	
+	public OFActionPushIPH() 
+	{
+		super();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + tunnelEntry;
+		result = prime * result + tunnelExit;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OFActionPushIPH other = (OFActionPushIPH) obj;
+		if (tunnelEntry != other.tunnelEntry)
+			return false;
+		if (tunnelExit != other.tunnelExit)
+			return false;
+		return true;
+	}
+
+	@Override
+	public void readFrom(ChannelBuffer data) {
+		super.readFrom(data);
+        this.tunnelEntry = data.readInt();
+        this.tunnelExit = data.readInt();
+	}
+
+	@Override
+	public void writeTo(ChannelBuffer data) {
+		super.writeTo(data);
+        data.writeInt(this.tunnelEntry);
+        data.writeInt(this.tunnelExit);
+	}
+	
+	
+}

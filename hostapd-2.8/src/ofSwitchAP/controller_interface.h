@@ -1,0 +1,104 @@
+/*
+ * controller_interface.h
+ *
+ *  Created on: Nov 1, 2015
+ *      Author: arkadeep
+ */
+
+#ifndef CONTROLLER_INTERFACE_H_
+#define CONTROLLER_INTERFACE_H_
+
+#include <stddef.h>
+#include <stdint.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include "utils/includes.h"
+#include "utils/common.h"
+#include "ap/sta_info.h"
+
+#define HASH_FUNC(address) address[0]
+
+struct controller_connection
+{
+	int sock;
+	int error;
+	uint64_t dpid;
+	uint16_t miss_send_len;
+	uint8_t *mac;
+
+	struct hostapd_data *hapd;
+
+	pthread_mutex_t mutex;
+
+	int inotifyFd;
+	int wd;
+
+	int tunCount;
+
+	pthread_mutex_t mutex_nat;
+	pthread_mutex_t mutex_port;
+	int loop_terminate;
+	unsigned char *ifIP;
+	char subnet[50];
+};
+
+struct mgmt_handle
+{
+	struct ieee80211_mgmt *mgmt;
+	size_t len;
+	struct sta_info *sta;
+};
+
+enum STAStatus {SELECTED, NOT_AUTHENTICATED, AUTHENTICATED, ASSOCIATED};
+
+struct infoSTA
+{
+	uint8_t address[6];
+	enum STAStatus status;
+	uint8_t lastReceivedSignalStrength;
+
+    uint16_t auth_alg;
+
+	uint16_t aid;
+    uint16_t capability;
+    uint16_t listen_interval;
+    uint8_t supported_rates[32];
+    uint32_t supported_rates_len;
+    uint8_t qosinfo;
+
+    char *ipaddr;
+
+    int tunNum;
+
+	struct infoSTA *next;
+};
+
+struct STAList
+{
+	int num_sta;
+	struct infoSTA **table;
+};
+
+struct rssi_handle
+{
+	uint8_t rssi;
+	uint8_t *mac;
+};
+
+int controller_conn_init(struct hostapd_data *hapd);
+void controller_conn_close(void);
+void *controller_run();
+void *data_frames_rssi();
+void *process_sta_msg(void *msg);
+void *handle_deauth_conn(void *msg);
+struct infoSTA *lookupSenderSTA(const uint8_t *address);
+void changeStatus(struct infoSTA *sta, enum STAStatus status);
+
+void *recvPkt(void *msg);
+
+static inline uint64_t htonll(uint64_t n)
+{
+    return htonl(1) == 1 ? n : ((uint64_t) htonl(n) << 32) | htonl(n >> 32);
+}
+
+#endif /* CONTROLLER_INTERFACE_H_ */

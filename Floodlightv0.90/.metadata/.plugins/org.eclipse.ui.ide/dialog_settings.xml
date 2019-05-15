@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="ExternalProjectImportWizard">
+		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
+		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
+	</section>
+	<section name="org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog">
+		<item value="false" key="FilterByLocation"/>
+		<item value="true" key="ShowStatusLine"/>
+		<item value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0A;&lt;workingSet workingSetName=&quot;&quot;/&gt;" key="WorkingSet"/>
+		<item value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0A;&lt;History&gt;&#x0A;&lt;historyRootNode&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/net/floodlightcontroller/core/internal/OFSwitchImpl.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/net/floodlightcontroller/hub/Hub.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/net/floodlightcontroller/core/internal/Controller.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/OFVendor.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/OFFlowMod.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/OFFeaturesReply.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/net/floodlightcontroller/learningswitch/LearningSwitch.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/net/floodlightcontroller/forwarding/Forwarding.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/vendor/OFByteArrayVendorData.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/OFMessage.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/floodlight/src/main/java/org/openflow/protocol/factory/MessageParseException.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;/historyRootNode&gt;&#x0A;&lt;/History&gt;" key="History"/>
+		<item value="false" key="ShowDerived"/>
+		<section name="DialogBoundsSettings">
+			<item value="600" key="DIALOG_WIDTH"/>
+			<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+			<item value="500" key="DIALOG_HEIGHT"/>
+			<item value="53" key="DIALOG_Y_ORIGIN"/>
+			<item value="359" key="DIALOG_X_ORIGIN"/>
+		</section>
+	</section>
+</section>

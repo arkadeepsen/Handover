@@ -1,0 +1,40 @@
+package net.floodlightcontroller.ofSwitchAP;
+
+public class OFNATMessageExt extends OFNATMessage {
+	
+	protected short newPort;
+
+	public OFNATMessageExt() {
+		super();
+	}
+
+	public OFNATMessageExt(int subtype) {
+		super(subtype);
+	}
+
+	public OFNATMessageExt(int subtype, byte[] staMacAddress, int sourceIP, int destinationIP, short sourcePort,
+			short destinationPort) {
+		super(subtype, staMacAddress, sourceIP, destinationIP, sourcePort, destinationPort);
+	}
+
+	public OFNATMessageExt(int subtype, byte[] staMacAddress, int sourceIP, int destinationIP, short sourcePort,
+			short destinationPort, short newPort) {
+		super(subtype, staMacAddress, sourceIP, destinationIP, sourcePort, destinationPort);
+		this.newPort = newPort;
+	}
+
+	public short getNewPort() {
+		return newPort;
+	}
+
+	public void setNewPort(short newPort) {
+		this.newPort = newPort;
+	}
+
+	@Override
+	public int getLength() {
+		return super.getLength() + 4;
+	}
+	
+
+}
