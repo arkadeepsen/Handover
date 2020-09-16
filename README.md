@@ -10,13 +10,23 @@ The project uses hostapd (version 2.8), Floodlight OpenFlow Controller (version 
 ## Modifications/Additions
 For implementation of the proposed SDEW framework and the seamless handover mechanism, various modifications were made to the source files of the softwares. Additionally, many new files were also added.
 ### hostapd
-The directory *ofSwitchAP* was added inside the *hostapd-2.8/src* directory. All the relevant files, required for the implementation, were added to the *ofSwitchAP* directory. Additionally, various exisitng files were also modified.
+The directory *ofSwitchAP* was added inside the *hostapd-2.8/src* directory. All the relevant files, required for the implementation, were added to the *ofSwitchAP* directory. Additionally, various exisitng files were also modified. The following `#define` directives in the **controller_interface.c** file inside the *ofSwitchAP* directory needs to be changed to the appropriate values before compilation:
+```C
+#define SOCK_ADDR "127.0.0.1"    // Change "127.0.0.1" to Floodlight OpenFlow Controller's IP address
+#define IFACE "wlan0"            // Change "wlan0" to the name of the wireless interface of the AP
+#define NATIFACE "eth0"          // Change "eth0" to the name of the ethernet interface of the AP
+#define NATSUBNET "192.168.5.0"  // Change "192.168.5.0" to the subnet which the NATIFACE belongs to
+```
 ### Floodlight OpenFlow Controller
 The directory *ofSwitchAP* was added inside the *Floodlightv0.90/floodlight/src/main/java/net/floodlightcontroller* directory. All the relevant FloodLight modules were added to the *ofSwitchAP* directory. Additionally, various exisitng files were also modified.
 ### Click Modular Router
 The *PrintSignalStrength.cc* and *PrintSignalStrength.hh* files were added to the *click/elements/wifi* directory.
 ### Gateway
-All the relevant files, required for the implementation of the **Gateway** were added to the *Gateway* directory.
+All the relevant files, required for the implementation of the **Gateway** were added to the *Gateway* directory. The following `#define` directives in the **gatewayNAT.c** file inside the *Gateway* directory needs to be changed to the appropriate values before compilation:
+```C
+#define SOCK_ADDR "127.0.0.1"    // Change "127.0.0.1" to Floodlight OpenFlow Controller's IP address
+#define IFACE "eth0"             // Change "eth0" to the ethernet interface towards the APs
+```
 ## Compilation
 Kindly follow the compilation and installation guides for each of the softwares (hostapd, Floodlight OpenFlow Controller and Click Modular Router). Remember to clean the already compiled files first. 
 ### Gateway
